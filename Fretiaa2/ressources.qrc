@@ -1,0 +1,20 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/iconAutoZoom.png</file>
+        <file>icons/iconDefaultSize.png</file>
+        <file>icons/iconDragAxe.png</file>
+        <file>icons/iconScrollZoom.png</file>
+        <file>icons/iconSelectZoom.png</file>
+        <file>icons/iconTrigger.png</file>
+        <file>icons/iconXY.png</file>
+        <file>icons/graphBackGround.png</file>
+        <file>icons/iconQuit.png</file>
+        <file>icons/iconAbout.png</file>
+        <file>icons/liveViewOnColoredOn.png</file>
+        <file>icons/liveViewOnColoredOff.png</file>
+        <file>icons/iconMoceRect.png</file>
+        <file>icons/iconHP.png</file>
+        <file>icons/iconFretiaa.png</file>
+        <file>darkorange.stylesheet</file>
+    </qresource>
+</RCC>
