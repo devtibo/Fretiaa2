@@ -254,6 +254,7 @@ void QFOscillogram::onAxisRangeChanged(const QCPRange&)
     selectRectangle->topLeft->setCoords(mPlot->xAxis->range().upper-selectRectangleWidth, mPlot->yAxis->range().upper);
     selectRectangle->bottomRight->setCoords(mPlot->xAxis->range().upper, mPlot->yAxis->range().lower);
 
+
     // Update Trigger Line coords
     triggerLine->start->setCoords(mPlot->xAxis->range().lower,triggerLevel);
     triggerLine->end->setCoords(mPlot->xAxis->range().upper, triggerLevel);
