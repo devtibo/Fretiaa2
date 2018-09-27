@@ -13,9 +13,9 @@ Fretiaa2.0 is a software to make real time audio /acoustical analyses.
 - **Oscillogram**
 - **Spectrum**
 - **Spectrogram** (Time-Frequency representation)
-- **Fractional-Octave-Band Spectrum** (e.g. 1-Octave, 1/3-Octave, ...):  [according to the NF EN 61260:1995 Standard]
+- **Fractional-Octave-Band Spectrum** (e.g. 1-Octave, 1/3-Octave, ...):  [according to the [NF EN 61260:1995 Standard](https://www.boutique.afnor.org/norme/nf-en-61260/electroacoustique-filtres-de-bande-d-octave-et-de-bande-d-une-fraction-d-octave/article/621055/fa026550)]
 - **VU-Meter** (in dBFS)
-- **dB-Meter**: A-, C- or Z- Weighting, and Fast, Slow or Impulsional time integration  [according to the NF EN 61672-2:2002 standard]
+- **dB-Meter**: A-, C- or Z- Weighting, and Fast, Slow or Impulsional time integration  [according to the [NF EN 61672-2:2002 standard](https://www.boutique.afnor.org/norme/nf-en-61672-2/electroacoustique-sonometres-partie-2-essais-d-evaluation-d-un-modele/article/708938/fa120317)]
 - **MultiMeter**: maximum, minimum, average and RMS (Root-Mean-Square) values
 
 All charts include exploration tools (zoom, auto zoom, selection of Region of Interest), axes ranges and single value viewing.
