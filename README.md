@@ -1,4 +1,4 @@
-##FRETIAA2
+## FRETIAA2
 -- Free REal TIme Audio Analyzer --
 
 pronounced \fʁe.ti.ja\ ("frétilla", which means wagged in french) also accept \fʁe.s.ia\ , which means nothing I think ;-).
@@ -7,8 +7,8 @@ pronounced \fʁe.ti.ja\ ("frétilla", which means wagged in french) also accept 
 
 Fretiaa2.0 is a software to make real time audio /acoustical analyses.
 
-![ ](/home/foufy/FUXs_QT_Programs/Fretiaa2/screenshots/fretiaa2.png  "Main Page")
-###1- Tools
+![ ](./screenshots/fretiaa2.png  "Main Page")
+### 1- Tools
 
 - **Oscillogram**
 - **Spectrum**
