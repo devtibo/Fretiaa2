@@ -1,5 +1,6 @@
 #include "qfmultimeter.h"
 #include <QGridLayout>
+#include <QRadioButton>
 
 
 QFMultiMeter::QFMultiMeter( QWidget *parent) : QWidget(parent), _unit("Pa"), _maxValue(0), _minValue(0), _avgValue(0), _absValue(0)
@@ -24,19 +25,49 @@ void QFMultiMeter::meterChangeOrientation(Qt::Orientation orientation)
 
 }
 
+void QFMultiMeter::onEnableToggle(bool checked)
+{
+
+     lAbsUnit->setEnabled(checked);
+     lAvgUnit->setEnabled(checked);
+     lMinUnit->setEnabled(checked);
+     lMaxUnit->setEnabled(checked);
+
+     lAbsValue->setEnabled(checked);
+     lAvgValue->setEnabled(checked);
+     lMinValue->setEnabled(checked);
+     lMaxValue->setEnabled(checked);
+
+     lAbsText->setEnabled(checked);
+     lAvgText->setEnabled(checked);
+     lMinText->setEnabled(checked);
+     lMaxText->setEnabled(checked);
+
+     emit enableChanged(checked);
+
+}
+
 QLayout *QFMultiMeter::createLayout(Qt::Orientation orientation)
 {
+
+    QRadioButton *enbale_check = new QRadioButton("On",this);
+    enbale_check->setChecked(true);
+    enbale_check->setStyleSheet({"color: #ffaa00;"});
+    connect(enbale_check,SIGNAL(toggled(bool)),this,SLOT(onEnableToggle(bool)));
 
 
     lAbsValue = new QLabel();
     lAvgValue = new QLabel();
     lMinValue = new QLabel();
     lMaxValue = new QLabel();
-updateLabels();
+
+    updateLabels();
 
     setUnit(_unit);
 
     QBoxLayout *m_layout ;
+
+
 
     if(orientation==Qt::Orientation::Vertical)
         m_layout = new QBoxLayout(QBoxLayout::Direction::TopToBottom);
@@ -51,31 +82,38 @@ updateLabels();
     f2.setItalic(false);
     f2.setPointSize(f2.pointSize()-3);
 
-    QLabel *lMaxText = new QLabel("Max",this);
+    lMaxText = new QLabel("Max",this);
     lMaxText->setFont(f);
     lMaxUnit->setFont(f2);
     lMaxValue->setFont(f2);
     lMaxValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
-    QLabel *lMinText = new QLabel("Min",this);
+    lMinText = new QLabel("Min",this);
     lMinText->setFont(f);
     lMinUnit->setFont(f2);
     lMinValue->setFont(f2);
     lMinValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
-    QLabel *lAvgText = new QLabel("Avg",this);
+    lAvgText = new QLabel("Avg",this);
     lAvgText->setFont(f);
     lAvgUnit->setFont(f2);
     lAvgValue->setFont(f2);
     lAvgValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
-    QLabel *lAbsText = new QLabel("RMS",this);
+    lAbsText = new QLabel("RMS",this);
     lAbsText->setFont(f);
     lAbsUnit->setFont(f2);
     lAbsValue->setFont(f2);
     lAbsValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
 
+    QFrame *line0 = new QFrame();
+    line0->setFrameShape(QFrame::VLine);
+    line0->setFrameShadow(QFrame::Sunken);
+
+
+    m_layout->addWidget(enbale_check);
+    m_layout->addWidget(line0);
 
 
     QGridLayout *maxLayout = new QGridLayout();
@@ -141,6 +179,7 @@ updateLabels();
     if(orientation == Qt::Orientation::Vertical)
     {
         m_layout->setDirection(QBoxLayout::Direction::TopToBottom);
+        line0->setFrameShape(QFrame::HLine);
         line->setFrameShape(QFrame::HLine);
         line2->setFrameShape(QFrame::HLine);
         line3->setFrameShape(QFrame::HLine);
@@ -148,6 +187,7 @@ updateLabels();
     else
     {
         m_layout->setDirection(QBoxLayout::Direction::LeftToRight);
+        line0->setFrameShape(QFrame::VLine);
         line->setFrameShape(QFrame::VLine);
         line2->setFrameShape(QFrame::VLine);
         line3->setFrameShape(QFrame::VLine);
@@ -188,7 +228,7 @@ double QFMultiMeter::absValue() const
 void QFMultiMeter::setAbsValue(double absValue)
 {
     _absValue = absValue;
-updateLabels();
+    updateLabels();
 }
 
 double QFMultiMeter::avgValue() const
@@ -199,7 +239,7 @@ double QFMultiMeter::avgValue() const
 void QFMultiMeter::setAvgValue(double avgValue)
 {
     _avgValue = avgValue;
- updateLabels();
+    updateLabels();
 }
 
 double QFMultiMeter::minValue() const
@@ -210,7 +250,7 @@ double QFMultiMeter::minValue() const
 void QFMultiMeter::setMinValue(double minValue)
 {
     _minValue = minValue;
-updateLabels();
+    updateLabels();
 }
 
 double QFMultiMeter::maxValue() const
@@ -221,6 +261,6 @@ double QFMultiMeter::maxValue() const
 void QFMultiMeter::setMaxValue(double maxValue)
 {
     _maxValue = maxValue;
-updateLabels();
+    updateLabels();
 }
 

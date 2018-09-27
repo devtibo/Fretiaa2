@@ -55,7 +55,8 @@ SOURCES += \
     QFPlot/qflevelmeter.cpp \
     QFPlot/qfmultimeter.cpp \
     inputaudiodevicedialog.cpp \
-    QFPlot/qfoscillogramroirectangle.cpp
+    QFPlot/qfoscillogramroirectangle.cpp \
+    gainswidget.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -70,7 +71,8 @@ HEADERS += \
     QFPlot/qflevelmeter.h \
     QFPlot/qfmultimeter.h \
     inputaudiodevicedialog.h \
-    QFPlot/qfoscillogramroirectangle.h
+    QFPlot/qfoscillogramroirectangle.h \
+    gainswidget.h
 
 RESOURCES += \
     ressources.qrc

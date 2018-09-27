@@ -36,7 +36,7 @@ QMenuBar::item:selected
 }
 
 QMenuBar::item:pressed
-{200
+{
     background: #444;
     border: 1px solid #000;
     background-color: QLinearGradient(
@@ -156,6 +156,13 @@ QComboBox::down-arrow
 {
      image: url(:/down_arrow.png);
 }
+
+QComboBox::selected
+{border: 1px solid transparent;
+     color: #000000;
+
+}
+
 
 QGroupBox:focus
 {
@@ -411,6 +418,7 @@ QTabBar::tab:!selected:hover
     border-top-right-radius: 3px;
     background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:1 #212121, stop:0.4 #343434, stop:0.2 #343434, stop:0.1 #ffaa00);
 }
+
 
 QRadioButton::indicator:checked, QRadioButton::indicator:unchecked{
     color: #b1b1b1;

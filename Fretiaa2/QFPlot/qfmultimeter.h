@@ -31,6 +31,7 @@ public:
 
 public slots:
     void meterChangeOrientation(Qt::Orientation);
+    void onEnableToggle(bool);
 
 private :
     QLayout *createLayout(Qt::Orientation);
@@ -47,10 +48,18 @@ private :
     QLabel *lAvgUnit;
     QLabel *lAbsUnit;
 
+    QLabel *lMaxText;
+    QLabel *lMinText;
+    QLabel *lAvgText;
+    QLabel *lAbsText;
+
     QString _unit;
 
 
     double _maxValue, _minValue, _avgValue, _absValue ;
+
+signals:
+    void enableChanged(bool);
 };
 
 #endif // QFMultiMeter_H

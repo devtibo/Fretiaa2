@@ -10,7 +10,8 @@ void QFLevelMeter::setLevel(const double val)
 {
     currenLevel = val;
     newbars->setData(QVector<double>{0},QVector<double>{val});
-    mPlot->replot();
+
+    mPlot->replot(QCustomPlot::rpQueuedReplot);
 }
 
 QLayout *QFLevelMeter::getOrientedLayout(const Qt::Orientation orientation)
@@ -25,6 +26,12 @@ QLayout *QFLevelMeter::getOrientedLayout(const Qt::Orientation orientation)
         mLayout = new QBoxLayout(QBoxLayout::Direction::TopToBottom);
     else
         mLayout = new QBoxLayout(QBoxLayout::Direction::LeftToRight);
+
+    QRadioButton *enbale_check = new QRadioButton("On",this);
+    enbale_check->setChecked(true);
+    enbale_check->setStyleSheet({"color: #ffaa00;"});
+    connect(enbale_check,SIGNAL(toggled(bool)),this,SLOT(onEnableToggle(bool)));
+    mLayout->addWidget(enbale_check);
 
     // Create plot
     mPlot = new QCustomPlot(this);
@@ -46,7 +53,7 @@ QLayout *QFLevelMeter::getOrientedLayout(const Qt::Orientation orientation)
     {
         mPlot->xAxis->setRange(0,-96);
         mPlot->xAxis->setVisible(true);
-        mPlot->yAxis2->setVisible(false);
+        mPlot->yAxis2->setVisible(true);
         mPlot->yAxis->setRange(-0.5,.5);
     }
 
@@ -106,6 +113,7 @@ QLayout *QFLevelMeter::getOrientedLayout(const Qt::Orientation orientation)
         mPlot->yAxis2->setVisible(true);
         mPlot->yAxis2->setTickPen(QPen(Qt::NoPen));
         mPlot->yAxis2->setSubTickPen(QPen(Qt::NoPen));
+        mPlot->yAxis2->setTickLabels(false);
         mPlot->yAxis2->setLabelColor(Qt::white);
     }
 
@@ -144,5 +152,12 @@ void QFLevelMeter::changeOrientation(const Qt::DockWidgetArea area)
     if (Qt::DockWidgetArea::RightDockWidgetArea == area ||Qt::DockWidgetArea::LeftDockWidgetArea == area )
         this->setLayout(getOrientedLayout(Qt::Orientation::Vertical));//setVerticalOrientation();
 
+}
 
+void QFLevelMeter::onEnableToggle(bool checked)
+{
+    qDebug() << "Enable is " << checked;
+    this->setLevel(-96);
+    mPlot->setEnabled(checked);
+    enableChanged(checked);
 }

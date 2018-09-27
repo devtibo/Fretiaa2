@@ -7,14 +7,15 @@ QFOscillogram::QFOscillogram(QWidget *parent) : QWidget(parent),
     triggerLevel(0.5),isTriggered(false),
     // isLiveView(true),
     triggerStillMove(false),
-    selectRectangleStillMove(false), _upperTime(0),_allowRectangleAutoMove(false)
+    selectRectangleStillMove(false), _upperTime(0),
+    _allowRectangleAutoMove(false), _gain(1)
 {
 
 
     // === Create Plot ===
     mPlot->addGraph();
     // mPlot->graph(0)->setData(QVector<double>{0},QVector<double>{0}); // Put one point at (0,0)
-    mPlot->graph(0)->setPen(QPen(Qt::cyan));
+    mPlot->graph(0)->setPen(QPen(Qt::green));
     /// Add toolsisTriggertemplate<typename T>
     mGraph = new QFGraph(mPlot,mPlot->graph(0));
 
@@ -40,8 +41,11 @@ QFOscillogram::QFOscillogram(QWidget *parent) : QWidget(parent),
 
 
     // === Cutomize Plot ===
+    // TODO add ACPItemText at the bottom right angle (Time (s)) and at the top left(Amplitude)
     mPlot->xAxis->setLabel("Time (s)");
+    mPlot->xAxis->setLabelPadding(0);  // Space between label and axes
     mPlot->yAxis->setLabel("Amplitude (V)");
+    mPlot->yAxis->setLabelPadding(0);// Space between label and axes
     mPlot->yAxis->setRange(-1,1);
     mPlot->xAxis->setRange(0,5);
     /*QFont mFont = mPlot->xAxis->labelFont();upper
@@ -51,8 +55,8 @@ QFOscillogram::QFOscillogram(QWidget *parent) : QWidget(parent),
 
     // ==== Customize X-Axis ===
     QColor baseColor(QColor(255,68,0,140));
-    //QColor textColor(QColor(180,180,180));
-    QColor textColor(QColor(255,68,0));
+    QColor textColor(QColor(180,180,180));
+    //QColor textColor(QColor(255,68,0));
     QColor labelColor(QColor(150,150,150));
     mPlot->xAxis->setLabelColor(labelColor);
     mPlot->xAxis->setTickLabelColor(textColor);
@@ -121,6 +125,7 @@ QFOscillogram::QFOscillogram(QWidget *parent) : QWidget(parent),
 
     //Update tool
     connect(this,SIGNAL(availableSelectRectangleData()),this,SLOT(updateMultiMeter()));
+    connect(mGraph->meter,SIGNAL(enableChanged(bool)),this,SLOT(onMeterEnableChanged(bool)));
 
     // === Main view ===
     QHBoxLayout *mLayout = new QHBoxLayout(this);
@@ -213,13 +218,18 @@ void QFOscillogram::setAllowRectangleAutoMove(bool allowRectangleAutoMove)
 
 }
 
+double QFOscillogram::gain() const
+{
+    return _gain;
+}
+
 void QFOscillogram::autoMoveRectangle()
 {
     auto maxIdx = mPlot->graph(0)->data().data()->end()-1;
 
 
     auto timeResolution = mPlot->graph(0)->data().data()->begin();
-    timeResolution++;
+    ++timeResolution;
     auto endOfAxis = mPlot->graph(0)->keyAxis()->range().upper - (timeResolution->key); // FIXME : Need  to remove 1/Fs to work!
 
     // Test if signal reaches the end of the x-axis
@@ -254,10 +264,19 @@ void QFOscillogram::onAxisRangeChanged(const QCPRange&)
     selectRectangle->topLeft->setCoords(mPlot->xAxis->range().upper-selectRectangleWidth, mPlot->yAxis->range().upper);
     selectRectangle->bottomRight->setCoords(mPlot->xAxis->range().upper, mPlot->yAxis->range().lower);
 
-
     // Update Trigger Line coords
     triggerLine->start->setCoords(mPlot->xAxis->range().lower,triggerLevel);
     triggerLine->end->setCoords(mPlot->xAxis->range().upper, triggerLevel);
+
+    // === Reload past data ===
+
+    auto timeResolution = mPlot->graph(0)->data().data()->begin();
+    ++timeResolution;
+
+    int beginIdx = qRound(mPlot->xAxis->range().lower / timeResolution->key);
+    int endIdx = qRound(mPlot->xAxis->range().upper / timeResolution->key);
+    if (beginIdx<0) beginIdx=0;
+    if (endIdx<0) endIdx=0;
 }
 
 
@@ -352,10 +371,6 @@ void QFOscillogram::onSelectRectangleMove(QMouseEvent *event)
 
 }
 
-////////////////////////////////////////////////////////:
-///  WARNING !!!!!!!!!!!!!!
-/// /////////////////////////////////////////////////////////::
-
 
 //  TODO: try to use selection class of QCustomPlot!
 void QFOscillogram::updateSelectRectangleData()
@@ -409,6 +424,19 @@ void QFOscillogram::updateMultiMeter()
     result2 =qSqrt(std::accumulate(selectRectangleData().constBegin(), selectRectangleData().constEnd(),.0,square<double>())/selectRectangleData().size());
     //this->setMultiMeterAbsValue(result2);
     mGraph->meter->setAbsValue(result2) ;
+}
+
+void QFOscillogram::onMeterEnableChanged(bool checked)
+{
+    if (checked)
+        connect(this,SIGNAL(availableSelectRectangleData()),this,SLOT(updateMultiMeter()));
+    else
+        disconnect(this,SIGNAL(availableSelectRectangleData()),this,SLOT(updateMultiMeter()));
+}
+
+void QFOscillogram::changeGain(double gain)
+{
+    _gain=gain;
 }
 
 

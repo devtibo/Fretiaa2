@@ -11,8 +11,9 @@ int main(int argc, char *argv[])
     a.setWindowIcon(QIcon(":/icons/iconFretiaa.png"));
 
     // -  Apparence // source : http://www.yasinuludag.com/darkorange.stylesheet
+
     a.setStyle("plastique");
-    QFile f(":darkorange.stylesheet");
+    QFile f(":/darkorange/darkorange.stylesheet");
     if (!f.exists())
     {
         printf("Unable to set stylesheet, file not found\n");

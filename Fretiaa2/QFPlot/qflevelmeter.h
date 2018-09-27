@@ -20,6 +20,9 @@ private:
     QCustomPlot *mPlot;
 public slots:
     void changeOrientation(const Qt::DockWidgetArea);
+    void onEnableToggle(bool);
+signals:
+    void enableChanged(bool);
 };
 
 #endif // QFLEVELMETER_H

@@ -15,6 +15,9 @@
         <file>icons/iconMoceRect.png</file>
         <file>icons/iconHP.png</file>
         <file>icons/iconFretiaa.png</file>
-        <file>darkorange.stylesheet</file>
+        <file>darkorange/checkbox.png</file>
+        <file>darkorange/darkorange.stylesheet</file>
+        <file>darkorange/down_arrow.png</file>
+        <file>darkorange/handle.png</file>
     </qresource>
 </RCC>

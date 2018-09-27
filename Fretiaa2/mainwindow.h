@@ -9,6 +9,7 @@
 #include "aboutdialog.h"
 #include "QFPlot/qfplot.h"
 #include "inputaudiodevicedialog.h"
+#include "gainswidget.h"
 #include <QAudioInput>
 #include <QIODevice>
 #include <QtMath>
@@ -34,6 +35,7 @@ private:
     void createToolBar(void);
 
 
+    QLabel *audioConfig;
 
 
     // ----AUDIO ENGINE ----
@@ -64,7 +66,9 @@ public slots:
     void onROIActionToggled(bool);
 
     void onReadyRead();
+
     void updateLevelMeter();
+    void onLevelMeterEnableChanged(bool);
 
     void onRefreshGraphs();
 

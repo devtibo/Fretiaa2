@@ -41,6 +41,8 @@ public:
 
     void setAllowRectangleAutoMove(bool allowRectangleAutoMove);
 
+    double gain() const;
+
 private:
     // === Mainplot ===
     QFGraph *mGraph;
@@ -60,6 +62,9 @@ private:
     bool isTriggered;
     bool triggerStillMove;
 
+    // === Change Gain ===
+    double _gain;
+
 public slots:
     // === MainPlot ===
     void onAxisRangeChanged (const QCPRange&);
@@ -72,6 +77,10 @@ public slots:
 
     // === Multimeter ===
     void updateMultiMeter();
+    void onMeterEnableChanged(bool);
+
+    // === change Gain ===
+    void changeGain(double);
 
 signals:
     /**

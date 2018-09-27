@@ -10,10 +10,27 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(oscillogramWidget);
     connect(oscillogramWidget,SIGNAL(availableSelectRectangleData()),this,SLOT(updateLevelMeter()));
 
+    // === Open Temporary file to store data in order to reduce reduce reploting computation load and to not saturated the RAMemory ===
+    mFileData = new QFile("data.bin");
+    mFileData->open(QFile::ReadWrite | QIODevice::Truncate);
+
+    // === Status bar ===
+    audioConfig = new QLabel("audio config...");
+    audioConfig->setStyleSheet("QLabel {color : #151515; }");
+    audioConfig->setAlignment(Qt::AlignLeft);
+    QStatusBar *mStatusBar = new QStatusBar(this);
+    mStatusBar->addWidget(audioConfig,1);
+    mStatusBar->setStyleSheet(" color : blue;");
+    this->setStatusBar(mStatusBar);
+
     // === DockWidget: LevelMeter ===
     levelMeterWidget = new QFLevelMeter(Qt::Orientation::Vertical,this);
 
-    QDockWidget *levelMeterDock = new QDockWidget(this);
+    //Enable/Disable connection
+    connect(levelMeterWidget,SIGNAL(enableChanged(bool)),this,SLOT(onLevelMeterEnableChanged(bool)));
+
+    //TODO disable widget when closed!
+    QDockWidget *levelMeterDock = new QDockWidget("VU-Meter",this);
     levelMeterDock->setWidget(levelMeterWidget);
     this->addDockWidget(Qt::RightDockWidgetArea, levelMeterDock);
 
@@ -28,25 +45,32 @@ MainWindow::MainWindow(QWidget *parent)
     connect(levelMeterDock,SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),levelMeterWidget,SLOT(changeOrientation(Qt::DockWidgetArea)));
     levelMeterWidget->setLevel(-96);
 
-    // === Menu Bar: Create menubar ===
-    createMenuBar(); // Need to be called after DowkWidgets creation
+    // === DockWidget: Gain ===
+    GainsWidget *gainsWidget = new GainsWidget(this);
 
+    QDockWidget *gainsDock = new QDockWidget("Gains settings",this);
+    gainsDock->setWidget(gainsWidget);
+    this->addDockWidget(Qt::BottomDockWidgetArea, gainsDock);
+
+    connect(gainsDock,SIGNAL(dockLocationChanged(Qt::DockWidgetArea)),gainsWidget,SLOT(changeOrientation(Qt::DockWidgetArea)));
+
+    connect(gainsWidget,SIGNAL(gainChanged(double)),oscillogramWidget,SLOT(changeGain(double))); // Connect to gain widget
     // === ToolBar menu: Create ToolBar ===
     createToolBar();
 
+    // === Menu Bar: Create menubar ===
+    createMenuBar(); // Need to be called after DowkWidgets creation and after toolBar creation
+
+
     // === AudioInput: Open Input Device ===
     initAudio();
+
 
     //=== TIMER to refresh graphs ===
     QTimer *mTimer = new QTimer();
     mTimer->setInterval(100);
     mTimer->start();
     connect(mTimer,SIGNAL(timeout()), this, SLOT(onRefreshGraphs()));
-
-    // === Open Temporary file to store data in order to reduce reduce reploting computation load and to not saturated the RAMemory ===
-    mFileData = new QFile("data.bin");
-    mFileData->open(QFile::ReadWrite | QIODevice::Truncate);
-
 }
 
 MainWindow::~MainWindow()
@@ -89,7 +113,7 @@ void MainWindow::createMenuBar()
 void MainWindow::createToolBar()
 {
     QSize appToolBar_IsonSize = QSize(30,30);
-    QToolBar *appToolBar = new QToolBar(this);
+    QToolBar *appToolBar = new QToolBar("Controls",this);
 
     appToolBar->setFloatable(true);
     appToolBar->setIconSize(appToolBar_IsonSize);
@@ -196,6 +220,50 @@ void MainWindow::initAudio()
     for (int i=0;i<(soundBufferSize/2);i++)
         xVecBase.append(i*1.0/Fs);
 
+    // === Print audio configuration ===
+    QString tmp;
+    tmp = "Device: ";
+    tmp += m_deviceInfo.deviceName();
+    tmp += " (";
+    tmp += QString::number(prefferedFormat.sampleRate());
+    tmp += "Hz, ";
+    tmp += QString::number(prefferedFormat.sampleSize());
+    tmp += "bits, ";
+    tmp += "channelCount=";
+    tmp += QString::number(prefferedFormat.channelCount());
+    tmp += ", ";
+    tmp += "sampleType=";
+    switch (prefferedFormat.sampleType()) {
+    case 0:
+        tmp += "Unknown";
+        break;
+    case 1:
+        tmp += "SignedInt";
+        break;
+    case 2:
+        tmp += "UnSignedInt";
+        break;
+    case 3:
+        tmp += "Float";
+        break;
+    }
+    tmp += ", ";
+    tmp += "byteOrder=";
+    switch (prefferedFormat.byteOrder()) {
+    case 0:
+        tmp += "BigEndian";
+        break;
+    case 1:
+        tmp += "LittleEndian";
+        break;
+    }
+    tmp += ", ";
+    tmp += "codec=";
+    tmp += prefferedFormat.codec();
+    tmp += ")";
+
+    audioConfig->setText(tmp);
+
     qDebug() << prefferedFormat;
 }
 
@@ -277,7 +345,7 @@ void MainWindow::onReadyRead()
     QVector<double> myArray(qRound(count/2.0));
     std::copy(sample,sample + count/2,myArray.begin());
     std::transform (myArray.begin(), myArray.end(), myArray.begin(),
-                    bind(std::divides<double>(), std::placeholders::_1, 32768)); // FIXME Not really correct
+                    bind(std::divides<double>(), std::placeholders::_1, 32768.0 / oscillogramWidget->gain())); // FIXME Not really correct
 
     //Construct time vector
     QVector<double> x(xVecBase.mid(0,qRound(count/2.0)));
@@ -289,6 +357,7 @@ void MainWindow::onReadyRead()
 
     // Add data to the graph
     oscillogramWidget->mPlot->graph(0)->addData(x, myArray);
+
     // Remove invisible data
     oscillogramWidget->mPlot->graph(0)->data().data()->removeBefore(oscillogramWidget->mPlot->xAxis->range().lower);
 
@@ -315,6 +384,14 @@ void MainWindow::updateLevelMeter()
     // Set the widget level
     if(!isnanf(float(tmp)))
         levelMeterWidget->setLevel(tmp);
+}
+
+void MainWindow::onLevelMeterEnableChanged(bool checked)
+{
+    if (checked)
+        connect(oscillogramWidget,SIGNAL(availableSelectRectangleData()),this,SLOT(updateLevelMeter()));
+    else
+        disconnect(oscillogramWidget,SIGNAL(availableSelectRectangleData()),this,SLOT(updateLevelMeter()));
 }
 
 void MainWindow::onRefreshGraphs()
