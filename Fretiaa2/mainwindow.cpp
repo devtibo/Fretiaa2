@@ -385,7 +385,10 @@ void MainWindow::updateLevelMeter()
     if(!isnanf(float(tmp)))
         levelMeterWidget->setLevel(tmp);
 }
-
+/**
+ * @brief MainWindow::onLevelMeterEnableChanged
+ * @param checked
+ */
 void MainWindow::onLevelMeterEnableChanged(bool checked)
 {
     if (checked)
